@@ -1,0 +1,8 @@
+altair==4.2.0
+matplotlib @ file:///C:/ci/matplotlib-suite_1647423638658/work
+matplotlib-inline==0.1.3
+numpy==1.23.1
+pandas @ file:///C:/ci/pandas_1657532024991/work
+plotly==5.9.0
+seaborn @ file:///tmp/build/80754af9/seaborn_1629307859561/work
+streamlit==1.11.0
