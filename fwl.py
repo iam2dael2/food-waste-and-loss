@@ -363,7 +363,8 @@ with chart2:
     st.caption('Sumber: WWF Indonesia')
 
 # Tabel Data untuk Plotting
-fig, ax = plt.subplots(figsize=(10,4))
+fig1, ax1 = plt.subplots()
+fig2, ax2 = plt.subplots()
 
 anc_all_persen['Group'] = "Survei Multinegara"
 anc_ind_persen['Group'] = "Survei Indonesia"
@@ -386,17 +387,26 @@ ind = data.loc[data['Group'] == 'Survei Indonesia']['total'].values
 all = data.loc[data['Group'] == 'Survei Multinegara']['total'].values
 x = data['Umur'].unique()
 
-w = 0.4
-bar1 = np.arange(len(x))
-bar2 = [i+w for i in bar1]
-ax.bar(bar1, all, w, label='Survei Indonesia')
-ax.bar(bar2, ind, w, label='Survei Multinegara')
-ax.set_xlabel("Umur")
-ax.set_ylabel("Persentase")
-ax.set_xticks(bar1+w/2, x)
-ax.legend()
 st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
-st.pyplot(fig)
+
+chart1, chart2 = st.columns(2)
+with chart1:
+    bar1 = np.arange(len(x))
+    ax1.bar(bar1, ind, label='Survei Indonesia')
+    ax1.set_xlabel("Umur")
+    ax1.set_ylabel("Persentase")
+    ax1.set_xticks(bar1, x)
+    ax1.legend()
+    st.pyplot(fig1)
+with chart2:
+    bar1 = np.arange(len(x))
+    ax2.bar(bar1, all, label='Survei Multinegara', color='orange')
+    ax2.set_xlabel("Umur")
+    ax2.set_ylabel("Persentase")
+    ax2.set_xticks(bar1, x)
+    ax2.legend()
+    st.pyplot(fig2)
+
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
