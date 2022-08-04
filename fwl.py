@@ -362,51 +362,7 @@ with chart2:
     st.pyplot(fig1)
     st.caption('Sumber: WWF Indonesia')
 
-# Tabel Data untuk Plotting
-fig1, ax1 = plt.subplots()
-fig2, ax2 = plt.subplots()
-
-anc_all_persen['Group'] = "Survei Multinegara"
-anc_ind_persen['Group'] = "Survei Indonesia"
-
-data = pd.concat([anc_all_persen, anc_ind_persen], axis=0)
-data = data.loc[data['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
-
-# Mengurutkan Kolom
-data = data[['Pilihan', 'Group', '18-24', '25-34', '35-44', '45-54', '55+']]
-data = pd.melt(data, id_vars=['Pilihan', 'Group'])
-
-# Merubah nama
-data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
-
-data.drop('Pilihan', axis=1, inplace=True)
-data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
-data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
-
-ind = data.loc[data['Group'] == 'Survei Indonesia']['total'].values
-all = data.loc[data['Group'] == 'Survei Multinegara']['total'].values
-x = data['Umur'].unique()
-
-st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
-
-chart1, chart2 = st.columns(2)
-with chart1:
-    bar1 = range(len(x))
-    ax1.bar(bar1, ind, label='Survei Indonesia')
-    ax1.set_xlabel("Umur")
-    ax1.set_ylabel("Persentase")
-    ax1.set_xticks(bar1, x)
-    ax1.legend()
-    st.pyplot(fig1)
-with chart2:
-    bar1 = range(len(x))
-    ax2.bar(bar1, all, label='Survei Multinegara', color='orange')
-    ax2.set_xlabel("Umur")
-    ax2.set_ylabel("Persentase")
-    ax2.set_xticks(bar1, x)
-    ax2.legend()
-    st.pyplot(fig2)
-
+# Put here
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
