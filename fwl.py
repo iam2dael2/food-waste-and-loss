@@ -280,7 +280,7 @@ jumlah_ind = anc_ind_persen[['Pilihan', 'Jumlah']]
 # Ancaman All Jumlah
 chart1, chart2 = st.columns(2)
 with chart1:
-    st.subheader("Survei  Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat: Ancaman FWL terkait Lingkungan dan Planet Kita")
+    st.subheader("Survei Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat: Ancaman FWL terkait Lingkungan dan Planet Kita")
     old_labels = jumlah['Pilihan'].values
     sizes = jumlah['Jumlah'].values
     total = jumlah['Jumlah'].sum()
@@ -361,17 +361,39 @@ with chart2:
     st.pyplot(fig1)
     st.caption('Sumber: WWF Indonesia')
 
+# Tabel Data untuk Plotting
+fig, ax = plt.subplots(figsize=(10,8))
+
+anc_all_persen['Group'] = "Survei  Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat"
+
+anc_ind_persen['Group'] = "Survei Indonesia"
+anc_ind_persen.drop('Jumlah', axis=1, inplace=True)
+
+ancaman = pd.concat([anc_all_persen, anc_ind_persen], axis=0).reset_index(drop=True)
+data = ancaman.loc[ancaman['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
+data = pd.melt(data, id_vars=["Pilihan", "Group"])
+data = data.drop("Pilihan", axis=1)
+data["total"] = data.groupby(['Group', 'variable'])['value'].transform(lambda x: sum(x))
+data = data.drop_duplicates(subset=['Group', 'variable', 'total']).reset_index(drop=True).drop('value', axis=1)
+data.pivot(index="variable", columns="Group", values='total').plot(kind="bar", ax=ax)
+ax.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize=16)
+ax.set_title("Rekapitulasi Pandangan FWL Tidak atau Kurang Mengancam Kehidupan Lingkungan dan Planet Kita", fontsize=26)
+ax.set_xlabel("Golongan Umur", fontsize=20)
+ax.set_ylabel("Persentase (%)", fontsize=20)
+st.pyplot(fig)
+
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
 # NOTE PENTING: TEKANKAN KALAU SELURUH DUNIA ITU LEBIH DIKIT MILIH YG KURANG MENGANCAM, 
 # TAPI TERNYATA SEBAGIAN BESAR YANG MILIH ITU ADALAH ORANG INDONESIA, YAITU 61%
 st.markdown(
     '''
-    Pada survei yang melibatkan banyak negara, bisa dilihat bahwa adanya korelasi positif antara
-    umur dan pandangan masyarakat terhadap ancaman FWL.
+    Berdasarkan grafik di atas, bisa dilihat bahwa adanya **korelasi negatif antara umur dan pandangan 
+    masyarakat dunia (Survei Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika 
+    Selatan, Inggris dan Amerika Serikat) bahwa FWL tidak atau kurang mengancam**.
 
-    Sebaliknya, **terdapat korelasi negatif antara umur dan pandangan masyarakat Indonesia** terhadap ancaman
-    FWL**.
+    Sebaliknya, **terdapat korelasi positif antara umur dan pandangan masyarakat Indonesia bahwa FWL
+    tidak atau kurang mengancam**.
     '''
 )
 # PROGRAM PEMERINTAH
