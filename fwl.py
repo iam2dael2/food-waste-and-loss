@@ -391,7 +391,7 @@ st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
 
 chart1, chart2 = st.columns(2)
 with chart1:
-    bar1 = np.arange(len(x))
+    bar1 = range(len(x))
     ax1.bar(bar1, ind, label='Survei Indonesia')
     ax1.set_xlabel("Umur")
     ax1.set_ylabel("Persentase")
@@ -399,7 +399,7 @@ with chart1:
     ax1.legend()
     st.pyplot(fig1)
 with chart2:
-    bar1 = np.arange(len(x))
+    bar1 = range(len(x))
     ax2.bar(bar1, all, label='Survei Multinegara', color='orange')
     ax2.set_xlabel("Umur")
     ax2.set_ylabel("Persentase")
