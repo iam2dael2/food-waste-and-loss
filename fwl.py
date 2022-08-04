@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -362,24 +363,39 @@ with chart2:
     st.caption('Sumber: WWF Indonesia')
 
 # Tabel Data untuk Plotting
-fig, ax = plt.subplots(figsize=(10,8))
+fig, ax = plt.subplots(figsize=(10,4))
 
-anc_all_persen['Group'] = "Survei  Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat"
-
+anc_all_persen['Group'] = "Survei Multinegara"
 anc_ind_persen['Group'] = "Survei Indonesia"
-anc_ind_persen.drop('Jumlah', axis=1, inplace=True)
 
-ancaman = pd.concat([anc_all_persen, anc_ind_persen], axis=0).reset_index(drop=True)
-data = ancaman.loc[ancaman['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
-data = pd.melt(data, id_vars=["Pilihan", "Group"])
-data = data.drop("Pilihan", axis=1)
-data["total"] = data.groupby(['Group', 'variable'])['value'].transform(lambda x: sum(x))
-data = data.drop_duplicates(subset=['Group', 'variable', 'total']).reset_index(drop=True).drop('value', axis=1)
-data.pivot(index="variable", columns="Group", values='total').plot(kind="bar", ax=ax)
-ax.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize=16)
-ax.set_title("Rekapitulasi Pandangan FWL Tidak atau Kurang Mengancam Kehidupan Lingkungan dan Planet Kita", fontsize=26)
-ax.set_xlabel("Golongan Umur", fontsize=20)
-ax.set_ylabel("Persentase (%)", fontsize=20)
+data = pd.concat([anc_all_persen, anc_ind_persen], axis=0)
+data = data.loc[data['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
+
+# Mengurutkan Kolom
+data = data[['Pilihan', 'Group', '18-24', '25-34', '35-44', '45-54', '55+']]
+data = pd.melt(data, id_vars=['Pilihan', 'Group'])
+
+# Merubah nama
+data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
+
+data.drop('Pilihan', axis=1, inplace=True)
+data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
+data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
+
+ind = data.loc[data['Group'] == 'Survei Indonesia']['total'].values
+all = data.loc[data['Group'] == 'Survei Multinegara']['total'].values
+x = data['Umur'].unique()
+
+w = 0.4
+bar1 = np.arange(len(x))
+bar2 = [i+w for i in bar1]
+ax.bar(bar1, all, w, label='Survei Indonesia')
+ax.bar(bar2, ind, w, label='Survei Multinegara')
+ax.set_xlabel("Umur")
+ax.set_ylabel("Persentase")
+ax.set_xticks(bar1+w/2, x)
+ax.legend()
+st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
 st.pyplot(fig)
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
