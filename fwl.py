@@ -362,6 +362,7 @@ with chart2:
     st.pyplot(fig1)
     st.caption('Sumber: WWF Indonesia')
 
+
 # Put here
 anc_all_persen['Group'] = "Survei Multinegara"
 anc_ind_persen['Group'] = "Survei Indonesia"
@@ -404,6 +405,42 @@ fig = px.bar(data, x="Umur", y="total",
     st.plotly_chart(fig)
     st.caption("Sumber: Data Diolah")
 '''
+
+chart1, chart2 = st.columns(2)
+with chart1:
+    st.subheader("Survei  Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat: Ancaman FWL terkait Lingkungan dan Planet Kita")
+    old_labels = anc_all_persen['Pilihan'].values
+    sizes = anc_all_persen[option].values
+    labels = []
+    for label, size in zip(old_labels, sizes):
+        labels.append(f'{label} ({size}%)')
+    explode = [0.1, 0.1, 0, 0]
+    fig1, ax1 = plt.subplots(figsize=(10,8))
+    patches = ax1.pie(sizes, explode=explode, shadow=True, startangle=90)
+    ax1.legend(patches[0], labels, loc="upper left", bbox_to_anchor=(0.85, 1.0), fontsize=16)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig1)
+    st.caption('Sumber: WWF Indonesia')
+with chart2:
+    st.subheader("Survei Indonesia: Ancaman FWL terkait Lingkungan dan Planet Kita")
+    st.write('')
+    st.write('')
+    st.write('')
+    st.write('')
+    old_labels = anc_ind_persen['Pilihan'].values
+    sizes = anc_ind_persen[option].values
+    total = jumlah_ind['Jumlah'].sum()
+    labels = []
+    for label, size in zip(old_labels, sizes):
+        labels.append(f'{label} ({size}%)')
+    explode = [0.1, 0.1, 0, 0]        
+    fig1, ax1 = plt.subplots(figsize=(10,8))
+    patches = ax1.pie(sizes, explode=explode,shadow=True, startangle=90)
+    ax1.legend(patches[0], labels, loc="upper left", bbox_to_anchor=(0.85, 1.0), fontsize=16)
+    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig1)
+    st.caption('Sumber: WWF Indonesia')
+
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
 # NOTE PENTING: TEKANKAN KALAU SELURUH DUNIA ITU LEBIH DIKIT MILIH YG KURANG MENGANCAM, 
