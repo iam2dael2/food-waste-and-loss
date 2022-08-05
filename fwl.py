@@ -363,6 +363,36 @@ with chart2:
     st.caption('Sumber: WWF Indonesia')
 
 # Put here
+anc_all_persen['Group'] = "Survei Multinegara"
+anc_ind_persen['Group'] = "Survei Indonesia"
+
+data = pd.concat([anc_all_persen, anc_ind_persen], axis=0)
+data = data.loc[data['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
+
+# Mengurutkan Kolom
+data = data[['Pilihan', 'Group', '18-24', '25-34', '35-44', '45-54', '55+']]
+data = pd.melt(data, id_vars=['Pilihan', 'Group'])
+
+# Merubah nama
+data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
+
+data.drop('Pilihan', axis=1, inplace=True)
+data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
+data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
+
+ind = data.loc[data['Group'] == 'Survei Indonesia']['total'].values
+all = data.loc[data['Group'] == 'Survei Multinegara']['total'].values
+x = data['Umur'].unique()
+
+col1, col2, col3 = st.columns([1,6,1])
+with col2:
+    fig = px.bar(data, x="Umur", y="total",
+                color='Group', barmode='group',
+                height=400, labels={'total': 'Persentase (%)'})
+    st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
+    st.plotly_chart(fig)
+    st.caption("Sumber: Data Diolah")
+
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
