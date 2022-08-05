@@ -8,6 +8,40 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 st.set_page_config(layout='wide')
+
+anc_all_persen = pd.read_csv('./Data/ancaman_all_persentase.csv')
+anc_ind_persen = pd.read_csv('./Data/ancaman_ind_persentase.csv')
+anc_all_persen['Group'] = "Survei Multinegara"
+anc_ind_persen['Group'] = "Survei Indonesia"
+
+data = pd.concat([anc_all_persen, anc_ind_persen], axis=0)
+data = data.loc[data['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
+
+# Mengurutkan Kolom
+data = data[['Pilihan', 'Group', '18-24', '25-34', '35-44', '45-54', '55+']]
+data = pd.melt(data, id_vars=['Pilihan', 'Group'])
+
+# Merubah nama
+data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
+
+data.drop('Pilihan', axis=1, inplace=True)
+data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
+data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
+data.rename(columns={'total': 'Persentase (%)'}, inplace=True)
+
+ind = data.loc[data['Group'] == 'Survei Indonesia'].drop('Group', axis=1).set_index("Umur")
+all = data.loc[data['Group'] == 'Survei Multinegara'].drop('Group', axis=1).set_index("Umur")
+
+option = st.selectbox(
+    "Pilih Kategori Survei",
+    ("Survei Indonesia", "Survei Multinegara"))
+
+if option == "Survei Indonesia":
+    st.subheader("Proporsi Masyarakat Indonesia yang Menganggap FLW Tidak Mengancam")
+    st.bar_chart(ind)
+else:
+    st.subheader("Proporsi Masyarakat Multinegara yang Menganggap FLW Tidak Mengancam")
+    st.bar_chart(all)
 st.image(
     './header.jpg',
     caption="Indonesia memproduksi sampah makanan hingga mencapai 115-184 kilogram per kapita per tahun selama tahun 2000-2019 (Bappenas, 2021)",
@@ -269,7 +303,7 @@ st.markdown(
 )
 
 jumlah = pd.read_csv('./Data/ancaman_all_jumlah.csv')
-anc_all_persen = pd.read_csv('./Data/ancaman_all_persentase.csv')
+
 tind_all_persen = pd.read_csv('./Data/tindakan_all_persentase.csv')
 anc_ind_persen = pd.read_csv('./Data/ancaman_ind_persentase.csv')
 tind_ind_persen = pd.read_csv('./Data/tindakan_ind_persentase.csv')
@@ -364,37 +398,6 @@ with chart2:
 
 
 # Put here
-anc_all_persen['Group'] = "Survei Multinegara"
-anc_ind_persen['Group'] = "Survei Indonesia"
-
-data = pd.concat([anc_all_persen, anc_ind_persen], axis=0)
-data = data.loc[data['Pilihan'].isin(['Bukan Ancaman Sama Sekali', 'Bukan Ancaman yang Begitu Penting'])]
-
-# Mengurutkan Kolom
-data = data[['Pilihan', 'Group', '18-24', '25-34', '35-44', '45-54', '55+']]
-data = pd.melt(data, id_vars=['Pilihan', 'Group'])
-
-# Merubah nama
-data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
-
-data.drop('Pilihan', axis=1, inplace=True)
-data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
-data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
-data.rename(columns={'total': 'Persentase (%)'}, inplace=True)
-
-ind = data.loc[data['Group'] == 'Survei Indonesia'].drop('Group', axis=1).set_index("Umur")
-all = data.loc[data['Group'] == 'Survei Multinegara'].drop('Group', axis=1).set_index("Umur")
-
-option = st.selectbox(
-    "Pilih Kategori Survei",
-    ("Survei Indonesia", "Survei Multinegara"))
-
-if option == "Survei Indonesia":
-    st.subheader("Proporsi Masyarakat Indonesia yang Menganggap FLW Tidak Mengancam")
-    st.bar_chart(ind)
-else:
-    st.subheader("Proporsi Masyarakat Multinegara yang Menganggap FLW Tidak Mengancam")
-    st.bar_chart(all)
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
