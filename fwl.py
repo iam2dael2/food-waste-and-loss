@@ -380,66 +380,21 @@ data.rename(columns={'variable': 'Umur', 'value': 'Persentase'}, inplace=True)
 data.drop('Pilihan', axis=1, inplace=True)
 data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
 data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
+data.rename(columns={'total': 'Persentase (%)'}, inplace=True)
 
-ind = data.loc[data['Group'] == 'Survei Indonesia']
-all = data.loc[data['Group'] == 'Survei Multinegara']
+ind = data.loc[data['Group'] == 'Survei Indonesia'].drop('Group', axis=1).set_index("Umur")
+all = data.loc[data['Group'] == 'Survei Multinegara'].drop('Group', axis=1).set_index("Umur")
 
-st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
-col1, _, col2 = st.columns([1,0.3,1])
-with col1:
-    figure1 = px.bar(all, x="Umur", y="total", barmode='group',
-                height=400, labels={'total': 'Persentase (%)'})
-    st.subheader('Survei Multinegara')
-    st.plotly_chart(figure1)
-with col2:
-    figure2 = px.bar(ind, x="Umur", y="total", barmode='group',
-                height=400, labels={'total': 'Persentase (%)'})
-    st.subheader('Survei Indonesia')
-    st.plotly_chart(figure2)
+option = st.selectbox(
+    "Pilih Kategori Survei",
+    ("Survei Indonesia", "Survei Multinegara"))
 
-'''
-fig = px.bar(data, x="Umur", y="total",
-                color='Group', barmode='group',
-                height=400, labels={'total': 'Persentase (%)'})
-    st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
-    st.plotly_chart(fig)
-    st.caption("Sumber: Data Diolah")
-'''
-
-chart1, chart2 = st.columns(2)
-with chart1:
-    st.subheader("Survei  Australia, Brasil, Kolombia, India, Indonesia, Malaysia, Belanda, Afrika Selatan, Inggris dan Amerika Serikat: Ancaman FWL terkait Lingkungan dan Planet Kita")
-    old_labels = anc_all_persen['Pilihan'].values
-    sizes = anc_all_persen[option].values
-    labels = []
-    for label, size in zip(old_labels, sizes):
-        labels.append(f'{label} ({size}%)')
-    explode = [0.1, 0.1, 0, 0]
-    fig1, ax1 = plt.subplots(figsize=(10,8))
-    patches = ax1.pie(sizes, explode=explode, shadow=True, startangle=90)
-    ax1.legend(patches[0], labels, loc="upper left", bbox_to_anchor=(0.85, 1.0), fontsize=16)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig1)
-    st.caption('Sumber: WWF Indonesia')
-with chart2:
-    st.subheader("Survei Indonesia: Ancaman FWL terkait Lingkungan dan Planet Kita")
-    st.write('')
-    st.write('')
-    st.write('')
-    st.write('')
-    old_labels = anc_ind_persen['Pilihan'].values
-    sizes = anc_ind_persen[option].values
-    total = jumlah_ind['Jumlah'].sum()
-    labels = []
-    for label, size in zip(old_labels, sizes):
-        labels.append(f'{label} ({size}%)')
-    explode = [0.1, 0.1, 0, 0]        
-    fig1, ax1 = plt.subplots(figsize=(10,8))
-    patches = ax1.pie(sizes, explode=explode,shadow=True, startangle=90)
-    ax1.legend(patches[0], labels, loc="upper left", bbox_to_anchor=(0.85, 1.0), fontsize=16)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig1)
-    st.caption('Sumber: WWF Indonesia')
+if option == "Survei Indonesia":
+    st.subheader("Proporsi Masyarakat Indonesia yang Menganggap FLW Tidak Mengancam")
+    st.bar_chart(ind)
+else:
+    st.subheader("Proporsi Masyarakat Multinegara yang Menganggap FLW Tidak Mengancam")
+    st.bar_chart(all)
 
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
