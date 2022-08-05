@@ -380,20 +380,30 @@ data.drop('Pilihan', axis=1, inplace=True)
 data["total"] = data.groupby(['Group', 'Umur'])['Persentase'].transform(lambda x: sum(x))
 data = data.drop_duplicates(subset=['Group', 'Umur', 'total']).reset_index(drop=True).drop('Persentase', axis=1)
 
-ind = data.loc[data['Group'] == 'Survei Indonesia']['total'].values
-all = data.loc[data['Group'] == 'Survei Multinegara']['total'].values
-x = data['Umur'].unique()
+ind = data.loc[data['Group'] == 'Survei Indonesia']
+all = data.loc[data['Group'] == 'Survei Multinegara']
 
-col1, col2, col3 = st.columns([1,6,1])
+st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
+col1, _, col2 = st.columns([1,0.3,1])
+with col1:
+    figure1 = px.bar(all, x="Umur", y="total", barmode='group',
+                height=400, labels={'total': 'Persentase (%)'})
+    st.subheader('Survei Multinegara')
+    st.plotly_chart(figure1)
 with col2:
-    fig = px.bar(data, x="Umur", y="total",
+    figure2 = px.bar(ind, x="Umur", y="total", barmode='group',
+                height=400, labels={'total': 'Persentase (%)'})
+    st.subheader('Survei Indonesia')
+    st.plotly_chart(figure2)
+
+'''
+fig = px.bar(data, x="Umur", y="total",
                 color='Group', barmode='group',
                 height=400, labels={'total': 'Persentase (%)'})
     st.subheader("Proporsi Masyarakat Negara yang Menganggap FLW Tidak Mengancam")
     st.plotly_chart(fig)
     st.caption("Sumber: Data Diolah")
-
-
+'''
 # Hal yang sama juga berlaku buat ancaman_ind.persentase.csv & tindakan_ind_persentase.csv
 # st.columns(2) terus golong berdasarkan umur
 # NOTE PENTING: TEKANKAN KALAU SELURUH DUNIA ITU LEBIH DIKIT MILIH YG KURANG MENGANCAM, 
